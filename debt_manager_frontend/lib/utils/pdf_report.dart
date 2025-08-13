@@ -14,54 +14,40 @@ Future<Uint8List> buildExpenseReportPdf({
 }) async {
   final pdf = pw.Document();
 
+  // Calculate totals for intelligence
+  final double createdPendingTotal = _calculatePendingTotal(created);
+  final double owedPendingTotal = _calculatePendingTotal(owed);
+  final double netBalance = createdPendingTotal - owedPendingTotal;
+
   pdf.addPage(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
+      margin: pw.EdgeInsets.all(20),
       build:
           (context) => [
-            // Header
-            pw.Header(
-              level: 0,
-              child: pw.Text(
-                'Expense Report',
-                style: pw.TextStyle(
-                  fontSize: 24,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.blue,
-                ),
-              ),
-            ),
-
-            pw.SizedBox(height: 20),
-
-            // Report Info
+            // Clean Header
             pw.Container(
-              padding: pw.EdgeInsets.all(10),
+              width: double.infinity,
+              padding: pw.EdgeInsets.all(20),
               decoration: pw.BoxDecoration(
-                color: PdfColors.grey100,
-                borderRadius: pw.BorderRadius.circular(5),
+                color: PdfColors.blue900,
+                borderRadius: pw.BorderRadius.circular(10),
               ),
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Text(
-                    'Generated on: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}',
-                    style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
+                    'EXPENSE REPORT',
+                    style: pw.TextStyle(
+                      fontSize: 24,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.white,
+                    ),
                   ),
                   pw.SizedBox(height: 5),
                   pw.Text(
-                    'Between: ${currentUser.fullName} (@${currentUser.username})',
-                    style: pw.TextStyle(
-                      fontSize: 14,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  pw.Text(
-                    'and: ${customer.fullName} (@${customer.username})',
-                    style: pw.TextStyle(
-                      fontSize: 14,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
+                    'Financial Summary',
+                    style: pw.TextStyle(fontSize: 12, color: PdfColors.white),
                   ),
                 ],
               ),
@@ -69,29 +55,51 @@ Future<Uint8List> buildExpenseReportPdf({
 
             pw.SizedBox(height: 20),
 
-            // Summary
+            // Report Info
             pw.Container(
               padding: pw.EdgeInsets.all(15),
               decoration: pw.BoxDecoration(
-                color: PdfColors.blue50,
+                color: PdfColors.grey100,
                 borderRadius: pw.BorderRadius.circular(8),
-                border: pw.Border.all(color: PdfColors.blue, width: 2),
+                border: pw.Border.all(color: PdfColors.grey300),
               ),
-              child: pw.Text(
-                'Summary: $summary',
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.blue900,
-                ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    'Report Details',
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.SizedBox(height: 10),
+                  pw.Text(
+                    'Generated: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}',
+                  ),
+                  pw.Text(
+                    'From: ${currentUser.fullName} (@${currentUser.username})',
+                  ),
+                  pw.Text('To: ${customer.fullName} (@${customer.username})'),
+                ],
               ),
             ),
 
-            pw.SizedBox(height: 30),
+            pw.SizedBox(height: 20),
 
-            // Created Expenses Section
+            // Smart Summary
+            _buildSmartSummary(
+              summary,
+              netBalance,
+              currentUser.fullName,
+              customer.fullName,
+            ),
+
+            pw.SizedBox(height: 25),
+
+            // Money You Will Receive Section
             pw.Text(
-              'Expenses You Created (They Owe You):',
+              'MONEY YOU WILL RECEIVE',
               style: pw.TextStyle(
                 fontSize: 16,
                 fontWeight: pw.FontWeight.bold,
@@ -101,15 +109,16 @@ Future<Uint8List> buildExpenseReportPdf({
             pw.SizedBox(height: 10),
             _buildExpenseTable(
               created,
-              'Rs. ${_calculatePendingTotal(created).toStringAsFixed(2)}',
-              'Pending Total',
+              createdPendingTotal,
+              true,
+              customer.fullName,
             ),
 
-            pw.SizedBox(height: 30),
+            pw.SizedBox(height: 25),
 
-            // Owed Expenses Section
+            // Money You Owe Section
             pw.Text(
-              'Expenses You Owe (You Owe Them):',
+              'MONEY YOU OWE',
               style: pw.TextStyle(
                 fontSize: 16,
                 fontWeight: pw.FontWeight.bold,
@@ -119,17 +128,26 @@ Future<Uint8List> buildExpenseReportPdf({
             pw.SizedBox(height: 10),
             _buildExpenseTable(
               owed,
-              'Rs. ${_calculatePendingTotal(owed).toStringAsFixed(2)}',
-              'Pending Total',
+              owedPendingTotal,
+              false,
+              customer.fullName,
             ),
 
             pw.SizedBox(height: 30),
 
             // Footer
-            pw.Text(
-              'Generated by Debt Manager App',
-              style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
-              textAlign: pw.TextAlign.center,
+            pw.Container(
+              width: double.infinity,
+              padding: pw.EdgeInsets.all(15),
+              decoration: pw.BoxDecoration(
+                color: PdfColors.grey100,
+                borderRadius: pw.BorderRadius.circular(5),
+              ),
+              child: pw.Text(
+                'Generated by Debt Managver App',
+                style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+                textAlign: pw.TextAlign.center,
+              ),
             ),
           ],
     ),
@@ -138,72 +156,226 @@ Future<Uint8List> buildExpenseReportPdf({
   return pdf.save();
 }
 
+pw.Widget _buildSmartSummary(
+  String summary,
+  double netBalance,
+  String currentUserName,
+  String customerName,
+) {
+  PdfColor borderColor;
+  PdfColor backgroundColor;
+  String intelligentMessage;
+
+  if (netBalance > 0) {
+    borderColor = PdfColors.green600;
+    backgroundColor = PdfColors.green50;
+    intelligentMessage =
+        'GOOD NEWS: $customerName owes you Rs. ${netBalance.abs().toStringAsFixed(2)}. Request payment ASAP.';
+  } else if (netBalance < 0) {
+    borderColor = PdfColors.red600;
+    backgroundColor = PdfColors.red50;
+    intelligentMessage =
+        'ACTION NEEDED: You owe $customerName Rs. ${netBalance.abs().toStringAsFixed(2)}. Please pay ASAP.';
+  } else {
+    borderColor = PdfColors.blue600;
+    backgroundColor = PdfColors.blue50;
+    intelligentMessage =
+        'ALL CLEAR: You and $customerName are even. No pending amounts.';
+  }
+
+  return pw.Container(
+    width: double.infinity,
+    padding: pw.EdgeInsets.all(15),
+    decoration: pw.BoxDecoration(
+      color: backgroundColor,
+      borderRadius: pw.BorderRadius.circular(8),
+      border: pw.Border.all(color: borderColor, width: 2),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          'SUMMARY',
+          style: pw.TextStyle(
+            fontSize: 14,
+            fontWeight: pw.FontWeight.bold,
+            color: borderColor,
+          ),
+        ),
+        pw.SizedBox(height: 8),
+        pw.Text(summary, style: pw.TextStyle(fontSize: 12)),
+        pw.SizedBox(height: 10),
+        pw.Container(
+          padding: pw.EdgeInsets.all(10),
+          decoration: pw.BoxDecoration(
+            color: PdfColors.white,
+            borderRadius: pw.BorderRadius.circular(5),
+          ),
+          child: pw.Text(
+            intelligentMessage,
+            style: pw.TextStyle(
+              fontSize: 11,
+              fontWeight: pw.FontWeight.bold,
+              color: borderColor,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 pw.Widget _buildExpenseTable(
   List<Expense> expenses,
-  String totalAmount,
-  String totalLabel,
+  double totalAmount,
+  bool isPositive,
+  String otherPersonName,
 ) {
+  final PdfColor borderColor =
+      isPositive ? PdfColors.green600 : PdfColors.red600;
+  final PdfColor backgroundColor =
+      isPositive ? PdfColors.green50 : PdfColors.red50;
+
   if (expenses.isEmpty) {
     return pw.Container(
+      width: double.infinity,
       padding: pw.EdgeInsets.all(20),
+      decoration: pw.BoxDecoration(
+        color: PdfColors.grey100,
+        borderRadius: pw.BorderRadius.circular(8),
+        border: pw.Border.all(color: PdfColors.grey300),
+      ),
       child: pw.Text(
-        'No expenses found',
-        style: pw.TextStyle(
-          fontSize: 12,
-          color: PdfColors.grey600,
-          fontStyle: pw.FontStyle.italic,
-        ),
+        'No expenses found in this category',
+        style: pw.TextStyle(fontSize: 14, color: PdfColors.grey600),
         textAlign: pw.TextAlign.center,
       ),
     );
   }
 
+  // Create table data with proper structure
+  List<List<String>> tableData = [
+    // Header row
+    ['Description', 'Amount', 'Status', 'Created', 'Due Date', 'Notes'],
+    // Data rows
+    ...expenses
+        .map(
+          (e) => [
+            e.description,
+            'Rs. ${e.amount.toStringAsFixed(2)}',
+            e.status.toString().split('.').last.toUpperCase(),
+            DateFormat('dd/MM/yyyy').format(e.createdAt),
+            e.dueDate != null
+                ? DateFormat('dd/MM/yyyy').format(e.dueDate!)
+                : 'N/A',
+            e.notes ?? '-',
+          ],
+        )
+        .toList(),
+  ];
+
   return pw.Column(
     children: [
-      pw.Table.fromTextArray(
-        headers: [
-          'Description',
-          'Amount (Rs.)',
-          'Status',
-          'Created Date',
-          'Due Date',
-          'Notes',
-        ],
-        data:
-            expenses
-                .map(
-                  (e) => [
-                    e.description,
-                    e.amount.toStringAsFixed(2),
-                    e.status.toString().split('.').last,
-                    DateFormat('dd/MM/yyyy').format(e.createdAt),
-                    e.dueDate != null
-                        ? DateFormat('dd/MM/yyyy').format(e.dueDate!)
-                        : 'N/A',
-                    e.notes ?? '',
-                  ],
-                )
-                .toList(),
-        cellStyle: pw.TextStyle(fontSize: 9),
-        headerStyle: pw.TextStyle(
-          fontWeight: pw.FontWeight.bold,
-          color: PdfColors.white,
-          fontSize: 10,
-        ),
-        headerDecoration: pw.BoxDecoration(color: PdfColors.grey700),
-        cellAlignment: pw.Alignment.centerLeft,
-        border: pw.TableBorder.all(color: PdfColors.grey400),
-      ),
-      pw.SizedBox(height: 10),
+      // Main Table Container
       pw.Container(
-        padding: pw.EdgeInsets.all(8),
         decoration: pw.BoxDecoration(
-          color: PdfColors.grey200,
-          borderRadius: pw.BorderRadius.circular(4),
+          border: pw.Border.all(color: borderColor, width: 2),
+          borderRadius: pw.BorderRadius.circular(8),
         ),
-        child: pw.Text(
-          '$totalLabel: $totalAmount',
-          style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+        child: pw.Column(
+          children: [
+            // Use simple Table widget with fixed structure
+            pw.Table(
+              border: pw.TableBorder.all(color: PdfColors.grey300),
+              columnWidths: {
+                0: pw.FlexColumnWidth(3), // Description
+                1: pw.FlexColumnWidth(2), // Amount
+                2: pw.FlexColumnWidth(2), // Status
+                3: pw.FlexColumnWidth(2), // Created
+                4: pw.FlexColumnWidth(2), // Due Date
+                5: pw.FlexColumnWidth(2), // Notes
+              },
+              children: [
+                // Header Row
+                pw.TableRow(
+                  decoration: pw.BoxDecoration(color: borderColor),
+                  children:
+                      tableData[0]
+                          .map(
+                            (header) => pw.Padding(
+                              padding: pw.EdgeInsets.all(8),
+                              child: pw.Text(
+                                header,
+                                style: pw.TextStyle(
+                                  color: PdfColors.white,
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 10,
+                                ),
+                                textAlign: pw.TextAlign.center,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                ),
+                // Data Rows
+                ...tableData
+                    .skip(1)
+                    .map(
+                      (row) => pw.TableRow(
+                        children:
+                            row
+                                .map(
+                                  (cell) => pw.Padding(
+                                    padding: pw.EdgeInsets.all(6),
+                                    child: pw.Text(
+                                      cell,
+                                      style: pw.TextStyle(fontSize: 9),
+                                      textAlign: pw.TextAlign.center,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                    ),
+              ],
+            ),
+          ],
+        ),
+      ),
+
+      pw.SizedBox(height: 10),
+
+      // Total Section
+      pw.Container(
+        width: double.infinity,
+        padding: pw.EdgeInsets.all(6),
+        decoration: pw.BoxDecoration(
+          color: backgroundColor,
+          borderRadius: pw.BorderRadius.circular(6),
+          border: pw.Border.all(color: borderColor, width: 1),
+        ),
+        child: pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              isPositive
+                  ? 'Total to Receive from $otherPersonName:'
+                  : 'Total to Pay to $otherPersonName:',
+              style: pw.TextStyle(
+                fontSize: 10,
+                fontWeight: pw.FontWeight.bold,
+                color: borderColor,
+              ),
+            ),
+            pw.Text(
+              'Rs. ${totalAmount.toStringAsFixed(2)}',
+              style: pw.TextStyle(
+                fontSize: 10,
+                fontWeight: pw.FontWeight.bold,
+                color: borderColor,
+              ),
+            ),
+          ],
         ),
       ),
     ],

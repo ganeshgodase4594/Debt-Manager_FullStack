@@ -58,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Debt Manager'),
         actions: [
+          SizedBox(width: 8),
           Consumer<AuthProvider>(
             builder: (context, authProvider, _) {
               return PopupMenuButton(
@@ -192,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Spacer(),
+          SizedBox(width: 16),
           Consumer<AuthProvider>(
             builder: (context, authProvider, _) {
               return PopupMenuButton(

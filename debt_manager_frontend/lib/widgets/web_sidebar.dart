@@ -40,6 +40,7 @@ class WebSidebar extends StatelessWidget {
             icon: Icons.people,
             title: 'Customers',
           ),
+
           Spacer(),
           _buildLogoutButton(context),
         ],
@@ -58,7 +59,8 @@ class WebSidebar extends StatelessWidget {
                 radius: 40,
                 backgroundColor: AppColors.primaryColor,
                 child: Text(
-                  authProvider.user?.fullName.substring(0, 1).toUpperCase() ?? 'U',
+                  authProvider.user?.fullName.substring(0, 1).toUpperCase() ??
+                      'U',
                   style: TextStyle(fontSize: 32, color: Colors.white),
                 ),
               ),

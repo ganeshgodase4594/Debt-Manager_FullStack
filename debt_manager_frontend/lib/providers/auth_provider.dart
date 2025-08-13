@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:debt_manager_frontend/models/user.dart';
 import 'package:debt_manager_frontend/services/api_service.dart';
 import 'package:debt_manager_frontend/services/storage_service.dart';
+
 import 'package:flutter/material.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -27,6 +28,7 @@ class AuthProvider extends ChangeNotifier {
         _user = User.fromJson(json.decode(userData));
         _isAuthenticated = true;
         ApiService.setToken(token);
+
         notifyListeners();
       } catch (e) {
         await logout();

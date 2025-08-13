@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class CustomerService {
     private final CustomerRepository customerRepository;
     private final UserService userService;
+
     
     @Transactional
     public UserDto addCustomer(Long customerUserId, User user) {
@@ -34,6 +35,8 @@ public class CustomerService {
         customer.setUser(user);
         customer.setCustomerUser(customerUser);
         customerRepository.save(customer);
+        
+
         
         return userService.convertToDto(customerUser);
     }

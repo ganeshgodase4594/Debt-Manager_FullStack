@@ -1,6 +1,7 @@
 import 'package:debt_manager_frontend/providers/auth_provider.dart';
 import 'package:debt_manager_frontend/providers/expense_provider.dart';
 import 'package:debt_manager_frontend/providers/user_provider.dart';
+
 import 'package:debt_manager_frontend/screens/home_screen.dart';
 import 'package:debt_manager_frontend/screens/login_screen.dart';
 import 'package:debt_manager_frontend/utils/constants.dart';
@@ -19,8 +20,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProxyProvider<AuthProvider, ExpenseProvider>(
           create: (_) => ExpenseProvider(),
-          update: (_, authProvider, previousExpenseProvider) => 
-              ExpenseProvider(authProvider: authProvider),
+          update:
+              (_, authProvider, previousExpenseProvider) =>
+                  ExpenseProvider(authProvider: authProvider),
         ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
       ],

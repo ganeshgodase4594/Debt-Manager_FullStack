@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final UserService userService;
+
     
     @Transactional
     public ExpenseDto createExpense(ExpenseRequest request, User creator) {
@@ -37,6 +38,9 @@ public class ExpenseService {
         expense.setStatus(request.getStatus() != null ? request.getStatus() : expense.getStatus());
         
         Expense saved = expenseRepository.save(expense);
+        
+
+        
         return convertToDto(saved);
     }
     
@@ -87,6 +91,8 @@ public class ExpenseService {
         if (request.getStatus() != null) {
             expense.setStatus(request.getStatus());
         }
+        
+
         
         // Update debtor if changed
         if (!expense.getDebtor().getId().equals(request.getDebtorId())) {
