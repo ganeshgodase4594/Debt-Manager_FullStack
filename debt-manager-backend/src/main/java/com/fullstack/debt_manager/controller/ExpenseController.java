@@ -52,6 +52,14 @@ public class ExpenseController {
         return ResponseEntity.ok(ApiResponse.success(expenses));
     }
     
+    @GetMapping("/between/{userId}")
+    public ResponseEntity<ApiResponse<List<ExpenseDto>>> getExpensesBetweenUsers(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal User user) {
+        List<ExpenseDto> expenses = expenseService.getExpensesBetweenUsers(user.getId(), userId);
+        return ResponseEntity.ok(ApiResponse.success(expenses));
+    }
+    
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ExpenseDto>> getExpense(
             @PathVariable Long id,

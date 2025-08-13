@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 import '../models/api_response.dart';
+import '../models/expense.dart';
 
 class ApiService {
   static String? _token;
@@ -46,6 +47,19 @@ class ApiService {
       }
     } catch (e) {
       return ApiResponse<T>(success: false, message: 'Network error: $e');
+    }
+  }
+
+  static Future<List<Expense>> fetchExpensesBetweenUsers(int userId) async {
+    final response = await get<List<dynamic>>(
+      '/expenses/between/$userId',
+      (data) => data as List<dynamic>,
+    );
+
+    if (response.success && response.data != null) {
+      return response.data!.map((json) => Expense.fromJson(json)).toList();
+    } else {
+      throw Exception(response.message ?? 'Failed to fetch expenses');
     }
   }
 

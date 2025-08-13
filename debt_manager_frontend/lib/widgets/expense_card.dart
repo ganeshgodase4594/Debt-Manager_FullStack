@@ -84,7 +84,7 @@ class ExpenseCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '₹${expense.amount.toStringAsFixed(2)}',
+                    'Rs. ${expense.amount.toStringAsFixed(2)}',
                     style: AppTextStyles.headline1.copyWith(
                       color: AppColors.primaryColor,
                     ),

@@ -61,6 +61,15 @@ public class ExpenseService {
                 .collect(Collectors.toList());
     }
     
+    public List<ExpenseDto> getExpensesBetweenUsers(Long userId1, Long userId2) {
+        User user1 = userService.findById(userId1);
+        User user2 = userService.findById(userId2);
+        return expenseRepository.findExpensesBetweenUsers(user1, user2)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+    
     @Transactional
     public ExpenseDto updateExpense(Long expenseId, ExpenseRequest request, User user) {
         Expense expense = expenseRepository.findById(expenseId)

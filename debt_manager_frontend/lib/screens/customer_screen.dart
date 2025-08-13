@@ -1,9 +1,15 @@
 import 'package:debt_manager_frontend/models/user.dart';
+import 'package:debt_manager_frontend/models/expense.dart';
 import 'package:debt_manager_frontend/providers/user_provider.dart';
+import 'package:debt_manager_frontend/providers/expense_provider.dart';
 import 'package:debt_manager_frontend/utils/constants.dart';
+import 'package:debt_manager_frontend/utils/pdf_report.dart';
+import 'package:debt_manager_frontend/services/api_service.dart';
 import 'package:debt_manager_frontend/widgets/user_search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:printing/printing.dart';
+import 'package:debt_manager_frontend/providers/auth_provider.dart';
 
 class CustomersScreen extends StatefulWidget {
   @override
@@ -90,6 +96,94 @@ class _CustomersScreenState extends State<CustomersScreen> {
     }
   }
 
+  Future<void> _generateAndShareReport(
+    BuildContext context,
+    User customer,
+  ) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(child: CircularProgressIndicator()),
+      );
+
+      final currentUserId =
+          Provider.of<ExpenseProvider>(
+            context,
+            listen: false,
+          ).getCurrentUserId();
+      final currentUser =
+          Provider.of<AuthProvider>(context, listen: false).user;
+
+      if (currentUser == null) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('User not found'),
+            backgroundColor: AppColors.errorColor,
+          ),
+        );
+        return;
+      }
+
+      // Fetch expenses between users
+      final expenses = await ApiService.fetchExpensesBetweenUsers(customer.id);
+
+      // Separate expenses
+      final created =
+          expenses.where((e) => e.creator.id == currentUserId).toList();
+      final owed = expenses.where((e) => e.debtor.id == currentUserId).toList();
+
+      // Calculate totals (only pending expenses)
+      final totalCreated = created
+          .where((e) => e.status == ExpenseStatus.PENDING)
+          .fold(0.0, (sum, e) => sum + e.amount);
+      final totalOwed = owed
+          .where((e) => e.status == ExpenseStatus.PENDING)
+          .fold(0.0, (sum, e) => sum + e.amount);
+      final net = totalCreated - totalOwed;
+
+      // Generate summary
+      String summary;
+      if (net > 0) {
+        summary = '${customer.fullName} owes you Rs. ${net.toStringAsFixed(2)}';
+      } else if (net < 0) {
+        summary =
+            'You owe ${customer.fullName} Rs. ${(-net).toStringAsFixed(2)}';
+      } else {
+        summary = 'All settled! No outstanding balance.';
+      }
+
+      // Generate PDF
+      final pdfBytes = await buildExpenseReportPdf(
+        currentUser: currentUser,
+        customer: customer,
+        created: created,
+        owed: owed,
+        summary: summary,
+      );
+
+      // Close loading dialog
+      Navigator.pop(context);
+
+      // Show PDF preview and sharing options
+      await Printing.layoutPdf(onLayout: (format) async => pdfBytes);
+    } catch (e) {
+      // Close loading dialog if still open
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to generate report: $e'),
+          backgroundColor: AppColors.errorColor,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,6 +245,21 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     trailing: PopupMenuButton(
                       itemBuilder:
                           (context) => [
+                            PopupMenuItem(
+                              child: ListTile(
+                                leading: Icon(
+                                  Icons.picture_as_pdf,
+                                  color: AppColors.primaryColor,
+                                ),
+                                title: Text('Generate PDF Report'),
+                                dense: true,
+                              ),
+                              onTap:
+                                  () => _generateAndShareReport(
+                                    context,
+                                    customer,
+                                  ),
+                            ),
                             PopupMenuItem(
                               child: ListTile(
                                 leading: Icon(

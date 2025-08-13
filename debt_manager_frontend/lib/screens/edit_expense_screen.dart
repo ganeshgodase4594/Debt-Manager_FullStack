@@ -156,7 +156,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                 controller: _amountController,
                 decoration: InputDecoration(
                   labelText: 'Amount',
-                  prefixText: '₹ ',
+                  prefixText: 'Rs. ',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

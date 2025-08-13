@@ -41,7 +41,7 @@ class DashboardStats extends StatelessWidget {
                     Expanded(
                       child: _buildStatCard(
                         'Total Created',
-                        '₹${totalCreated.toStringAsFixed(2)}',
+                        'Rs. ${totalCreated.toStringAsFixed(2)}',
                         AppColors.primaryColor,
                         Icons.add_circle_outline,
                       ),
@@ -50,7 +50,7 @@ class DashboardStats extends StatelessWidget {
                     Expanded(
                       child: _buildStatCard(
                         'Total Owed',
-                        '₹${totalOwed.toStringAsFixed(2)}',
+                        'Rs. ${totalOwed.toStringAsFixed(2)}',
                         AppColors.warningColor,
                         Icons.remove_circle_outline,
                       ),
@@ -59,7 +59,7 @@ class DashboardStats extends StatelessWidget {
                     Expanded(
                       child: _buildStatCard(
                         'Pending (Created)',
-                        '₹${totalPendingCreated.toStringAsFixed(2)}',
+                        'Rs. ${totalPendingCreated.toStringAsFixed(2)}',
                         AppColors.successColor,
                         Icons.schedule,
                       ),
@@ -68,7 +68,7 @@ class DashboardStats extends StatelessWidget {
                     Expanded(
                       child: _buildStatCard(
                         'Pending (Owed)',
-                        '₹${totalPendingOwed.toStringAsFixed(2)}',
+                        'Rs. ${totalPendingOwed.toStringAsFixed(2)}',
                         AppColors.errorColor,
                         Icons.schedule,
                       ),
@@ -84,7 +84,7 @@ class DashboardStats extends StatelessWidget {
                         Expanded(
                           child: _buildStatCard(
                             'Total Created',
-                            '₹${totalCreated.toStringAsFixed(2)}',
+                            'Rs. ${totalCreated.toStringAsFixed(2)}',
                             AppColors.primaryColor,
                             Icons.add_circle_outline,
                           ),
@@ -93,7 +93,7 @@ class DashboardStats extends StatelessWidget {
                         Expanded(
                           child: _buildStatCard(
                             'Total Owed',
-                            '₹${totalOwed.toStringAsFixed(2)}',
+                            'Rs. ${totalOwed.toStringAsFixed(2)}',
                             AppColors.warningColor,
                             Icons.remove_circle_outline,
                           ),
@@ -106,7 +106,7 @@ class DashboardStats extends StatelessWidget {
                         Expanded(
                           child: _buildStatCard(
                             'Pending (Created)',
-                            '₹${totalPendingCreated.toStringAsFixed(2)}',
+                            'Rs. ${totalPendingCreated.toStringAsFixed(2)}',
                             AppColors.successColor,
                             Icons.schedule,
                           ),
@@ -115,7 +115,7 @@ class DashboardStats extends StatelessWidget {
                         Expanded(
                           child: _buildStatCard(
                             'Pending (Owed)',
-                            '₹${totalPendingOwed.toStringAsFixed(2)}',
+                            'Rs. ${totalPendingOwed.toStringAsFixed(2)}',
                             AppColors.errorColor,
                             Icons.schedule,
                           ),
