@@ -1,6 +1,9 @@
 import 'package:debt_manager_frontend/providers/auth_provider.dart';
 import 'package:debt_manager_frontend/screens/register_screen.dart';
 import 'package:debt_manager_frontend/utils/constants.dart';
+import 'package:debt_manager_frontend/widgets/gradient_button.dart';
+import 'package:debt_manager_frontend/widgets/gradient_card.dart';
+import 'package:debt_manager_frontend/widgets/modern_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
@@ -32,7 +36,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error), backgroundColor: AppColors.errorColor),
+          SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.errorColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     }
@@ -45,114 +54,158 @@ class _LoginScreenState extends State<LoginScreen> {
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primaryColor.withOpacity(0.8),
-              AppColors.primaryColor,
-            ],
-          ),
+          gradient: AppColors.primaryGradient,
         ),
-        child: Center(
-          child: Card(
-            margin: EdgeInsets.all(32),
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Container(
-              width: MediaQuery.of(context).size.width > 600 ? 400 : null,
-              padding: EdgeInsets.all(32),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.account_balance_wallet,
-                      size: 64,
-                      color: AppColors.primaryColor,
-                    ),
-                    SizedBox(height: 16),
-                    Text('Debt Manager', style: AppTextStyles.headline1),
-                    SizedBox(height: 8),
-                    Text('Sign in to your account', style: AppTextStyles.body2),
-                    SizedBox(height: 32),
-                    TextFormField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                SizedBox(height: 60),
+                // Logo and Welcome Section
+                Container(
+                  padding: EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [AppShadows.cardShadow],
+                        ),
+                        child: Icon(
+                          Icons.account_balance_wallet,
+                          size: 48,
+                          color: AppColors.primaryPink,
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your username';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                      SizedBox(height: 20),
+                      Text(
+                        'Debt Manager',
+                        style: AppTextStyles.headline1.copyWith(
+                          color: AppColors.white,
+                          fontSize: 28,
                         ),
                       ),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 24),
-                    Consumer<AuthProvider>(
-                      builder: (context, authProvider, _) {
-                        return SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: authProvider.isLoading ? null : _login,
-                            child:
-                                authProvider.isLoading
-                                    ? SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
-                                      ),
-                                    )
-                                    : Text('Sign In'),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RegisterScreen(),
-                          ),
-                        );
-                      },
-                      child: Text('Don\'t have an account? Sign up'),
-                    ),
-                  ],
+                      SizedBox(height: 8),
+                      Text(
+                        'Manage your finances with ease',
+                        style: AppTextStyles.body1.copyWith(
+                          color: AppColors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                SizedBox(height: 40),
+                
+                // Login Form Card
+                GradientCard(
+                  padding: EdgeInsets.all(32),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome Back',
+                          style: AppTextStyles.headline2,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Sign in to your account',
+                          style: AppTextStyles.body2,
+                        ),
+                        SizedBox(height: 32),
+                        
+                        ModernTextField(
+                          controller: _usernameController,
+                          labelText: 'Username',
+                          hintText: 'Enter your username',
+                          prefixIcon: Icons.person_outline,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your username';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        
+                        ModernTextField(
+                          controller: _passwordController,
+                          labelText: 'Password',
+                          hintText: 'Enter your password',
+                          prefixIcon: Icons.lock_outline,
+                          suffixIcon: _isPasswordVisible 
+                              ? Icons.visibility_off_outlined 
+                              : Icons.visibility_outlined,
+                          obscureText: !_isPasswordVisible,
+                          onSuffixIconTap: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 32),
+                        
+                        Consumer<AuthProvider>(
+                          builder: (context, authProvider, _) {
+                            return GradientButton(
+                              text: 'Sign In',
+                              width: double.infinity,
+                              isLoading: authProvider.isLoading,
+                              onPressed: authProvider.isLoading ? null : _login,
+                              icon: Icons.login,
+                            );
+                          },
+                        ),
+                        SizedBox(height: 24),
+                        
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RegisterScreen(),
+                                ),
+                              );
+                            },
+                            child: RichText(
+                              text: TextSpan(
+                                text: "Don't have an account? ",
+                                style: AppTextStyles.body2,
+                                children: [
+                                  TextSpan(
+                                    text: 'Sign up',
+                                    style: AppTextStyles.body2.copyWith(
+                                      color: AppColors.primaryPink,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40),
+              ],
             ),
           ),
         ),

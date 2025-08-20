@@ -74,7 +74,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
             Provider.of<ExpenseProvider>(context, listen: false).loadExpenses();
           }
         },
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.primaryPink,
         child: Icon(Icons.add),
       ),
     );

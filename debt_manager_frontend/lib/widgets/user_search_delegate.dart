@@ -17,7 +17,7 @@ class UserSearchDelegate extends SearchDelegate<User?> {
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.primaryPink,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -113,7 +113,7 @@ class UserSearchDelegate extends SearchDelegate<User?> {
                 children: [
                   CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryColor,
+                      AppColors.primaryPink,
                     ),
                   ),
                   SizedBox(height: 16),
@@ -187,11 +187,11 @@ class UserSearchDelegate extends SearchDelegate<User?> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
+                              color: AppColors.primaryPink,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primaryColor.withOpacity(
+                                  color: AppColors.primaryPink.withOpacity(
                                     0.3,
                                   ),
                                   blurRadius: 8,

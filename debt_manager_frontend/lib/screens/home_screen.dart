@@ -56,7 +56,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMobileLayout() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Debt Manager'),
+        title: Text(
+          'Debt Manager',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+          ),
+        ),
+        elevation: 0,
         actions: [
           SizedBox(width: 8),
           Consumer<AuthProvider>(
@@ -69,15 +82,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       CircleAvatar(
                         radius: 16,
+                        backgroundColor: Colors.white,
                         child: Text(
                           authProvider.user?.fullName
                                   .substring(0, 1)
                                   .toUpperCase() ??
                               'U',
+                          style: TextStyle(
+                            color: AppColors.primaryPink,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       SizedBox(width: 8),
-                      Text(authProvider.user?.fullName ?? 'User'),
+                      Text(
+                        authProvider.user?.fullName ?? 'User',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -107,35 +131,70 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: _getSelectedScreen(),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long),
-            label: 'Expenses',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Customers'),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: AppColors.primaryColor,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_rounded),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_rounded),
+              label: 'Expenses',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people_rounded),
+              label: 'Customers',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: AppColors.primaryPink,
+          unselectedItemColor: Colors.grey[600],
+          backgroundColor: Colors.white,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+        ),
       ),
       floatingActionButton:
           _selectedIndex == 0
-              ? FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CreateExpenseScreen(),
+              ? Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: AppColors.primaryGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryPink.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
                     ),
-                  );
-                },
-                child: Icon(Icons.add),
-                backgroundColor: AppColors.primaryColor,
+                  ],
+                ),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateExpenseScreen(),
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    Icons.add_rounded,
+                    size: 28,
+                  ),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
               )
               : null,
     );
@@ -161,17 +220,34 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton:
           _selectedIndex == 0
-              ? FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CreateExpenseScreen(),
+              ? Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: AppColors.primaryGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryPink.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
                     ),
-                  );
-                },
-                child: Icon(Icons.add),
-                backgroundColor: AppColors.primaryColor,
+                  ],
+                ),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateExpenseScreen(),
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    Icons.add_rounded,
+                    size: 28,
+                  ),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
               )
               : null,
     );
@@ -179,18 +255,45 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildWebAppBar() {
     return Container(
-      height: 64,
-      color: AppColors.primaryColor,
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      height: 70,
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
-          Text(
-            'Debt Manager',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              SizedBox(width: 12),
+              Text(
+                'Debt Manager',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
           Spacer(),
           SizedBox(width: 16),

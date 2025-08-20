@@ -230,7 +230,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                       child: Text(
                         customer.fullName.substring(0, 1).toUpperCase(),
                       ),
-                      backgroundColor: AppColors.primaryColor,
+                      backgroundColor: AppColors.primaryPink,
                       foregroundColor: Colors.white,
                     ),
                     title: Text(customer.fullName),
@@ -249,7 +249,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               child: ListTile(
                                 leading: Icon(
                                   Icons.picture_as_pdf,
-                                  color: AppColors.primaryColor,
+                                  color: AppColors.primaryPink,
                                 ),
                                 title: Text('Generate PDF Report'),
                                 dense: true,
@@ -283,7 +283,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _addCustomer,
         child: Icon(Icons.person_add),
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.primaryPink,
       ),
     );
   }

@@ -27,30 +27,108 @@ class ExpenseList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primaryPink.withOpacity(0.05),
+                AppColors.primaryOrange.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.primaryPink.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: AppTextStyles.headline2),
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.receipt_long_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: AppTextStyles.headline2.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
               if (!showAll && expenses.length > 3)
-                TextButton(
-                  onPressed: () {
-                    // Navigate to expenses screen with specific tab
-                    Navigator.pushNamed(context, '/expenses');
-                  },
-                  child: Text('View All'),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/expenses');
+                    },
+                    child: Text(
+                      'View All',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
             ],
           ),
         ),
         if (displayExpenses.isEmpty)
-          Padding(
-            padding: EdgeInsets.all(16),
+          Container(
+            margin: EdgeInsets.all(16),
+            padding: EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.grey[200]!,
+                width: 1,
+              ),
+            ),
             child: Center(
-              child: Text(
-                'No expenses found',
-                style: AppTextStyles.body1.copyWith(color: Colors.grey[600]),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.receipt_long_outlined,
+                    size: 48,
+                    color: Colors.grey[400],
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'No expenses found',
+                    style: AppTextStyles.headline3.copyWith(
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Create your first expense to get started',
+                    style: AppTextStyles.body2.copyWith(
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
               ),
             ),
           )

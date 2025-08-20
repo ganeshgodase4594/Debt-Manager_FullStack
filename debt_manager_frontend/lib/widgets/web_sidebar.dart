@@ -16,8 +16,24 @@ class WebSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
-      color: Colors.white,
+      width: 280,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.white,
+            Colors.grey[50]!,
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(2, 0),
+          ),
+        ],
+      ),
       child: Column(
         children: [
           _buildHeader(context),
@@ -52,26 +68,65 @@ class WebSidebar extends StatelessWidget {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         return Container(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(24),
+          margin: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryPink.withOpacity(0.3),
+                blurRadius: 15,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
           child: Column(
             children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: AppColors.primaryColor,
-                child: Text(
-                  authProvider.user?.fullName.substring(0, 1).toUpperCase() ??
-                      'U',
-                  style: TextStyle(fontSize: 32, color: Colors.white),
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    authProvider.user?.fullName.substring(0, 1).toUpperCase() ??
+                        'U',
+                    style: TextStyle(
+                      fontSize: 32,
+                      color: AppColors.primaryPink,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               SizedBox(height: 16),
               Text(
                 authProvider.user?.fullName ?? 'User',
-                style: AppTextStyles.headline2,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
               ),
+              SizedBox(height: 4),
               Text(
                 '@${authProvider.user?.username ?? ''}',
-                style: AppTextStyles.body2,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white.withOpacity(0.9),
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -88,30 +143,52 @@ class WebSidebar extends StatelessWidget {
   }) {
     final isSelected = selectedIndex == index;
 
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: isSelected ? AppColors.primaryColor : Colors.grey[600],
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: isSelected ? AppColors.primaryGradient : null,
+        color: isSelected ? null : Colors.transparent,
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: isSelected ? AppColors.primaryColor : Colors.grey[800],
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: isSelected ? Colors.white : Colors.grey[600],
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey[800],
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+        onTap: () => onItemSelected(index),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
-      selected: isSelected,
-      onTap: () => onItemSelected(index),
     );
   }
 
   Widget _buildLogoutButton(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
-        return ListTile(
-          leading: Icon(Icons.logout, color: Colors.grey[600]),
-          title: Text('Logout'),
-          onTap: () => authProvider.logout(),
+        return Container(
+          margin: EdgeInsets.all(16),
+          child: ListTile(
+            leading: Icon(Icons.logout_rounded, color: Colors.red[400]),
+            title: Text(
+              'Logout',
+              style: TextStyle(
+                color: Colors.red[400],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            onTap: () => authProvider.logout(),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
         );
       },
     );

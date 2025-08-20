@@ -29,22 +29,32 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Debt Manager',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.pink,
           visualDensity: VisualDensity.adaptivePlatformDensity,
+          scaffoldBackgroundColor: AppColors.white,
           appBarTheme: AppBarTheme(
-            backgroundColor: AppColors.primaryColor,
-            foregroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
+            foregroundColor: AppColors.darkText,
             elevation: 0,
+            titleTextStyle: AppTextStyles.headline3,
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              backgroundColor: AppColors.primaryPink,
+              foregroundColor: AppColors.white,
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(16),
               ),
+              elevation: 0,
             ),
+          ),
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            backgroundColor: AppColors.white,
+            selectedItemColor: AppColors.primaryPink,
+            unselectedItemColor: AppColors.lightText,
+            elevation: 8,
+            type: BottomNavigationBarType.fixed,
           ),
         ),
         home: Consumer<AuthProvider>(

@@ -1,6 +1,7 @@
 import 'package:debt_manager_frontend/models/expense.dart';
 import 'package:debt_manager_frontend/providers/expense_provider.dart';
 import 'package:debt_manager_frontend/utils/constants.dart';
+import 'package:debt_manager_frontend/widgets/gradient_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,38 +40,38 @@ class DashboardStats extends StatelessWidget {
                 return Row(
                   children: [
                     Expanded(
-                      child: _buildStatCard(
-                        'Total Created',
-                        'Rs. ${totalCreated.toStringAsFixed(2)}',
-                        AppColors.primaryColor,
-                        Icons.add_circle_outline,
+                      child: StatCard(
+                        title: 'Total Created',
+                        value: 'Rs. ${totalCreated.toStringAsFixed(2)}',
+                        icon: Icons.add_circle_outline,
+                        iconColor: AppColors.primaryPink,
                       ),
                     ),
                     SizedBox(width: 16),
                     Expanded(
-                      child: _buildStatCard(
-                        'Total Owed',
-                        'Rs. ${totalOwed.toStringAsFixed(2)}',
-                        AppColors.warningColor,
-                        Icons.remove_circle_outline,
+                      child: StatCard(
+                        title: 'Total Owed',
+                        value: 'Rs. ${totalOwed.toStringAsFixed(2)}',
+                        icon: Icons.remove_circle_outline,
+                        iconColor: AppColors.warningColor,
                       ),
                     ),
                     SizedBox(width: 16),
                     Expanded(
-                      child: _buildStatCard(
-                        'Pending (Created)',
-                        'Rs. ${totalPendingCreated.toStringAsFixed(2)}',
-                        AppColors.successColor,
-                        Icons.schedule,
+                      child: StatCard(
+                        title: 'Pending (Created)',
+                        value: 'Rs. ${totalPendingCreated.toStringAsFixed(2)}',
+                        icon: Icons.schedule,
+                        iconColor: AppColors.successColor,
                       ),
                     ),
                     SizedBox(width: 16),
                     Expanded(
-                      child: _buildStatCard(
-                        'Pending (Owed)',
-                        'Rs. ${totalPendingOwed.toStringAsFixed(2)}',
-                        AppColors.errorColor,
-                        Icons.schedule,
+                      child: StatCard(
+                        title: 'Pending (Owed)',
+                        value: 'Rs. ${totalPendingOwed.toStringAsFixed(2)}',
+                        icon: Icons.schedule,
+                        iconColor: AppColors.errorColor,
                       ),
                     ),
                   ],
@@ -82,20 +83,20 @@ class DashboardStats extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: _buildStatCard(
-                            'Total Created',
-                            'Rs. ${totalCreated.toStringAsFixed(2)}',
-                            AppColors.primaryColor,
-                            Icons.add_circle_outline,
+                          child: StatCard(
+                            title: 'Total Created',
+                            value: 'Rs. ${totalCreated.toStringAsFixed(2)}',
+                            icon: Icons.add_circle_outline,
+                            iconColor: AppColors.primaryPink,
                           ),
                         ),
                         SizedBox(width: 16),
                         Expanded(
-                          child: _buildStatCard(
-                            'Total Owed',
-                            'Rs. ${totalOwed.toStringAsFixed(2)}',
-                            AppColors.warningColor,
-                            Icons.remove_circle_outline,
+                          child: StatCard(
+                            title: 'Total Owed',
+                            value: 'Rs. ${totalOwed.toStringAsFixed(2)}',
+                            icon: Icons.remove_circle_outline,
+                            iconColor: AppColors.warningColor,
                           ),
                         ),
                       ],
@@ -104,20 +105,20 @@ class DashboardStats extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: _buildStatCard(
-                            'Pending (Created)',
-                            'Rs. ${totalPendingCreated.toStringAsFixed(2)}',
-                            AppColors.successColor,
-                            Icons.schedule,
+                          child: StatCard(
+                            title: 'Pending (Created)',
+                            value: 'Rs. ${totalPendingCreated.toStringAsFixed(2)}',
+                            icon: Icons.schedule,
+                            iconColor: AppColors.successColor,
                           ),
                         ),
                         SizedBox(width: 16),
                         Expanded(
-                          child: _buildStatCard(
-                            'Pending (Owed)',
-                            'Rs. ${totalPendingOwed.toStringAsFixed(2)}',
-                            AppColors.errorColor,
-                            Icons.schedule,
+                          child: StatCard(
+                            title: 'Pending (Owed)',
+                            value: 'Rs. ${totalPendingOwed.toStringAsFixed(2)}',
+                            icon: Icons.schedule,
+                            iconColor: AppColors.errorColor,
                           ),
                         ),
                       ],
