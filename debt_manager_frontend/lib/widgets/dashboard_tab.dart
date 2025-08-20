@@ -4,6 +4,7 @@ import 'package:debt_manager_frontend/utils/constants.dart';
 import 'package:debt_manager_frontend/widgets/dashboard_stat.dart';
 import 'package:debt_manager_frontend/widgets/expense_list.dart';
 import 'package:debt_manager_frontend/widgets/gradient_card.dart';
+import 'package:debt_manager_frontend/widgets/date_range_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,12 @@ class _DashboardTabState extends State<DashboardTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ExpenseProvider>(context, listen: false).loadExpenses();
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      // Set default date range to last 7 days
+      final now = DateTime.now();
+      final sevenDaysAgo = now.subtract(Duration(days: 7));
+      expenseProvider.setDateRange(DateTimeRange(start: sevenDaysAgo, end: now));
+      expenseProvider.loadExpenses();
     });
   }
 
@@ -29,8 +35,8 @@ class _DashboardTabState extends State<DashboardTab> {
           return Center(child: CircularProgressIndicator());
         }
 
-        final createdExpenses = expenseProvider.createdExpenses;
-        final debtorExpenses = expenseProvider.debtorExpenses;
+        final createdExpenses = expenseProvider.dashboardCreatedExpenses;
+        final debtorExpenses = expenseProvider.dashboardDebtorExpenses;
 
         return Container(
           decoration: BoxDecoration(
@@ -45,6 +51,22 @@ class _DashboardTabState extends State<DashboardTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 20),
+                  // Date Range Selector
+                  Consumer<ExpenseProvider>(
+                    builder: (context, provider, _) {
+                      final dateRange = provider.dateRange ?? DateTimeRange(
+                        start: DateTime.now().subtract(Duration(days: 7)),
+                        end: DateTime.now(),
+                      );
+                      return DateRangeSelector(
+                        selectedRange: dateRange,
+                        onRangeChanged: (range) {
+                          provider.setDateRange(range);
+                        },
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16),
                   DashboardStats(),
                   SizedBox(height: 24),
                   Padding(

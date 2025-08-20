@@ -4,11 +4,12 @@ import 'package:debt_manager_frontend/providers/user_provider.dart';
 import 'package:debt_manager_frontend/providers/expense_provider.dart';
 import 'package:debt_manager_frontend/utils/constants.dart';
 import 'package:debt_manager_frontend/utils/pdf_report.dart';
+import 'package:debt_manager_frontend/widgets/report_date_range_dialog.dart';
+import 'package:printing/printing.dart';
 import 'package:debt_manager_frontend/services/api_service.dart';
 import 'package:debt_manager_frontend/widgets/user_search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:printing/printing.dart';
 import 'package:debt_manager_frontend/providers/auth_provider.dart';
 
 class CustomersScreen extends StatefulWidget {
@@ -101,6 +102,22 @@ class _CustomersScreenState extends State<CustomersScreen> {
     User customer,
   ) async {
     try {
+      // Show date range selection dialog first
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      final currentDateRange = expenseProvider.dateRange ?? DateTimeRange(
+        start: DateTime.now().subtract(const Duration(days: 30)),
+        end: DateTime.now(),
+      );
+
+      final selectedDateRange = await showReportDateRangeDialog(
+        context: context,
+        initialRange: currentDateRange,
+      );
+
+      if (selectedDateRange == null) {
+        return; // User cancelled
+      }
+
       // Show loading indicator
       showDialog(
         context: context,
@@ -108,11 +125,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         builder: (context) => Center(child: CircularProgressIndicator()),
       );
 
-      final currentUserId =
-          Provider.of<ExpenseProvider>(
-            context,
-            listen: false,
-          ).getCurrentUserId();
+      final currentUserId = expenseProvider.getCurrentUserId();
       final currentUser =
           Provider.of<AuthProvider>(context, listen: false).user;
 
@@ -128,12 +141,19 @@ class _CustomersScreenState extends State<CustomersScreen> {
       }
 
       // Fetch expenses between users
-      final expenses = await ApiService.fetchExpensesBetweenUsers(customer.id);
+      final allExpenses = await ApiService.fetchExpensesBetweenUsers(customer.id);
+
+      // Filter expenses by selected date range
+      final filteredExpenses = allExpenses.where((expense) {
+        final expenseDate = expense.createdAt;
+        return expenseDate.isAfter(selectedDateRange.start.subtract(Duration(days: 1))) &&
+               expenseDate.isBefore(selectedDateRange.end.add(Duration(days: 1)));
+      }).toList();
 
       // Separate expenses
       final created =
-          expenses.where((e) => e.creator.id == currentUserId).toList();
-      final owed = expenses.where((e) => e.debtor.id == currentUserId).toList();
+          filteredExpenses.where((e) => e.creator.id == currentUserId).toList();
+      final owed = filteredExpenses.where((e) => e.debtor.id == currentUserId).toList();
 
       // Calculate totals (only pending expenses)
       final totalCreated = created
@@ -155,13 +175,14 @@ class _CustomersScreenState extends State<CustomersScreen> {
         summary = 'All settled! No outstanding balance.';
       }
 
-      // Generate PDF
+      // Generate PDF with date range
       final pdfBytes = await buildExpenseReportPdf(
         currentUser: currentUser,
         customer: customer,
         created: created,
         owed: owed,
         summary: summary,
+        dateRange: selectedDateRange,
       );
 
       // Close loading dialog

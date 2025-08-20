@@ -12,8 +12,8 @@ class DashboardStats extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ExpenseProvider>(
       builder: (context, expenseProvider, _) {
-        final createdExpenses = expenseProvider.createdExpenses;
-        final debtorExpenses = expenseProvider.debtorExpenses;
+        final createdExpenses = expenseProvider.dashboardCreatedExpenses;
+        final debtorExpenses = expenseProvider.dashboardDebtorExpenses;
 
         double totalCreated = createdExpenses
             .where((e) => e.status != ExpenseStatus.CANCELLED)

@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:debt_manager_frontend/models/expense.dart';
 import 'package:debt_manager_frontend/models/user.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
 Future<Uint8List> buildExpenseReportPdf({
   required User currentUser,
@@ -11,6 +12,7 @@ Future<Uint8List> buildExpenseReportPdf({
   required List<Expense> created,
   required List<Expense> owed,
   required String summary,
+  DateTimeRange? dateRange,
 }) async {
   final pdf = pw.Document();
 
@@ -77,6 +79,12 @@ Future<Uint8List> buildExpenseReportPdf({
                   pw.Text(
                     'Generated: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}',
                   ),
+                  if (dateRange != null) ...[
+                    pw.Text(
+                      'Period: ${DateFormat('dd/MM/yyyy').format(dateRange.start)} - ${DateFormat('dd/MM/yyyy').format(dateRange.end)}',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ],
                   pw.Text(
                     'From: ${currentUser.fullName} (@${currentUser.username})',
                   ),
