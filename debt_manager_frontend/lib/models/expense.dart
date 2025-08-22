@@ -1,6 +1,6 @@
 import 'package:debt_manager_frontend/models/user.dart';
 
-enum ExpenseStatus { PENDING, PAID, CANCELLED, OVERDUE }
+enum ExpenseStatus { PENDING, PAID, CANCELLED }
 
 class Expense {
   final int id;

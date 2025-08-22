@@ -24,8 +24,6 @@ class ExpenseCard extends StatelessWidget {
     switch (expense.status) {
       case ExpenseStatus.PAID:
         return AppColors.successColor;
-      case ExpenseStatus.OVERDUE:
-        return AppColors.errorColor;
       case ExpenseStatus.CANCELLED:
         return Colors.grey;
       default:
@@ -53,23 +51,21 @@ class ExpenseCard extends StatelessWidget {
               ),
               if (onDelete != null)
                 PopupMenuButton(
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: AppColors.lightText,
-                  ),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.delete,
-                          color: AppColors.errorColor,
+                  icon: Icon(Icons.more_vert, color: AppColors.lightText),
+                  itemBuilder:
+                      (context) => [
+                        PopupMenuItem(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.delete,
+                              color: AppColors.errorColor,
+                            ),
+                            title: Text('Delete'),
+                            dense: true,
+                          ),
+                          onTap: onDelete,
                         ),
-                        title: Text('Delete'),
-                        dense: true,
-                      ),
-                      onTap: onDelete,
-                    ),
-                  ],
+                      ],
                 ),
             ],
           ),
@@ -97,13 +93,10 @@ class ExpenseCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Amount',
-                    style: AppTextStyles.caption,
-                  ),
+                  Text('Amount', style: AppTextStyles.caption),
                   SizedBox(height: 4),
                   Text(
-                    'Rs. ${expense.amount.toStringAsFixed(2)}',
+                    '₹${expense.amount.toStringAsFixed(2)}',
                     style: AppTextStyles.headline2.copyWith(
                       color: AppColors.primaryPink,
                     ),
@@ -115,9 +108,7 @@ class ExpenseCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: _getStatusColor().withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: _getStatusColor().withOpacity(0.3),
-                  ),
+                  border: Border.all(color: _getStatusColor().withOpacity(0.3)),
                 ),
                 child: Text(
                   expense.status.toString().split('.').last.toUpperCase(),
@@ -152,7 +143,8 @@ class ExpenseCard extends StatelessWidget {
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      (currentUserId != null && expense.debtor.id == currentUserId)
+                      (currentUserId != null &&
+                              expense.debtor.id == currentUserId)
                           ? '${expense.creator.fullName} (@${expense.creator.username})'
                           : '${expense.debtor.fullName} (@${expense.debtor.username})',
                       style: AppTextStyles.body2,
@@ -168,19 +160,21 @@ class ExpenseCard extends StatelessWidget {
                 Icon(
                   Icons.schedule,
                   size: 16,
-                  color: expense.dueDate!.isBefore(DateTime.now()) &&
-                          expense.status != ExpenseStatus.PAID
-                      ? AppColors.errorColor
-                      : AppColors.lightText,
+                  color:
+                      expense.dueDate!.isBefore(DateTime.now()) &&
+                              expense.status != ExpenseStatus.PAID
+                          ? AppColors.errorColor
+                          : AppColors.lightText,
                 ),
                 SizedBox(width: 8),
                 Text(
                   'Due: ${DateFormat('MMM dd, yyyy').format(expense.dueDate!)}',
                   style: AppTextStyles.body2.copyWith(
-                    color: expense.dueDate!.isBefore(DateTime.now()) &&
-                            expense.status != ExpenseStatus.PAID
-                        ? AppColors.errorColor
-                        : AppColors.lightText,
+                    color:
+                        expense.dueDate!.isBefore(DateTime.now()) &&
+                                expense.status != ExpenseStatus.PAID
+                            ? AppColors.errorColor
+                            : AppColors.lightText,
                   ),
                 ),
               ],
@@ -197,11 +191,7 @@ class ExpenseCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.note,
-                    size: 16,
-                    color: AppColors.lightText,
-                  ),
+                  Icon(Icons.note, size: 16, color: AppColors.lightText),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -218,11 +208,7 @@ class ExpenseCard extends StatelessWidget {
           SizedBox(height: 12),
           Row(
             children: [
-              Icon(
-                Icons.access_time,
-                size: 14,
-                color: AppColors.lightText,
-              ),
+              Icon(Icons.access_time, size: 14, color: AppColors.lightText),
               SizedBox(width: 6),
               Text(
                 'Created ${DateFormat('MMM dd, yyyy').format(expense.createdAt)}',

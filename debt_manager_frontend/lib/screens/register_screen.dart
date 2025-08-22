@@ -93,16 +93,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(16),
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [AppShadows.cardShadow],
                         ),
-                        child: Icon(
-                          Icons.person_add,
-                          size: 32,
-                          color: AppColors.primaryPink,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'assets/images/register.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.person_add,
+                                size: 32,
+                                color: AppColors.primaryPink,
+                              );
+                            },
+                          ),
                         ),
                       ),
                       SizedBox(height: 16),

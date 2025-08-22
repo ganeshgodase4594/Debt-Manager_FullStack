@@ -5,6 +5,7 @@ import 'package:debt_manager_frontend/models/expense.dart';
 import 'package:debt_manager_frontend/models/user.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Future<Uint8List> buildExpenseReportPdf({
   required User currentUser,
@@ -15,6 +16,8 @@ Future<Uint8List> buildExpenseReportPdf({
   DateTimeRange? dateRange,
 }) async {
   final pdf = pw.Document();
+
+  // Removed logo image loading - using icon instead
 
   // Calculate totals for intelligence
   final double createdPendingTotal = _calculatePendingTotal(created);
@@ -27,7 +30,7 @@ Future<Uint8List> buildExpenseReportPdf({
       margin: pw.EdgeInsets.all(20),
       build:
           (context) => [
-            // Clean Header
+            // Clean Header with Logo
             pw.Container(
               width: double.infinity,
               padding: pw.EdgeInsets.all(20),
@@ -35,21 +38,93 @@ Future<Uint8List> buildExpenseReportPdf({
                 color: PdfColors.blue900,
                 borderRadius: pw.BorderRadius.circular(10),
               ),
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
+              child: pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: [
-                  pw.Text(
-                    'EXPENSE REPORT',
-                    style: pw.TextStyle(
-                      fontSize: 24,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.white,
+                  // Logo Section - Simple Design
+                  pw.Container(
+                    width: 60,
+                    height: 60,
+                    decoration: pw.BoxDecoration(
+                      gradient: pw.LinearGradient(
+                        colors: [PdfColors.pink300, PdfColors.orange300],
+                        begin: pw.Alignment.topLeft,
+                        end: pw.Alignment.bottomRight,
+                      ),
+                      borderRadius: pw.BorderRadius.circular(12),
+                    ),
+                    child: pw.Stack(
+                      children: [
+                        // Background circles for design
+                        pw.Positioned(
+                          top: 8,
+                          right: 8,
+                          child: pw.Container(
+                            width: 20,
+                            height: 20,
+                            decoration: pw.BoxDecoration(
+                              color: PdfColors.grey200,
+                              shape: pw.BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                        pw.Positioned(
+                          bottom: 8,
+                          left: 8,
+                          child: pw.Container(
+                            width: 15,
+                            height: 15,
+                            decoration: pw.BoxDecoration(
+                              color: PdfColors.grey100,
+                              shape: pw.BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                        // Rupee symbol design
+                        pw.Center(
+                          child: pw.Container(
+                            width: 30,
+                            height: 30,
+                            decoration: pw.BoxDecoration(
+                              color: PdfColors.white,
+                              shape: pw.BoxShape.circle,
+                            ),
+                            child: pw.Center(
+                              child: pw.Text(
+                                'Rs',
+                                style: pw.TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColors.pink700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  pw.SizedBox(height: 5),
-                  pw.Text(
-                    'Financial Summary',
-                    style: pw.TextStyle(fontSize: 12, color: PdfColors.white),
+                  pw.SizedBox(width: 16),
+                  // Title Section
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          'EXPENSE REPORT',
+                          style: pw.TextStyle(
+                            fontSize: 24,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.white,
+                          ),
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Text(
+                          'Financial Summary',
+                          style: pw.TextStyle(fontSize: 12, color: PdfColors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

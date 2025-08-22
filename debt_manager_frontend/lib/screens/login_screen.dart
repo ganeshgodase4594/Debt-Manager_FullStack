@@ -72,16 +72,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(20),
+                        width: 100,
+                        height: 100,
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [AppShadows.cardShadow],
                         ),
-                        child: Icon(
-                          Icons.account_balance_wallet,
-                          size: 48,
-                          color: AppColors.primaryPink,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            'assets/images/login.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.account_balance_wallet,
+                                size: 48,
+                                color: AppColors.primaryPink,
+                              );
+                            },
+                          ),
                         ),
                       ),
                       SizedBox(height: 20),

@@ -7,10 +7,12 @@ import 'package:debt_manager_frontend/utils/pdf_report.dart';
 import 'package:debt_manager_frontend/widgets/report_date_range_dialog.dart';
 import 'package:printing/printing.dart';
 import 'package:debt_manager_frontend/services/api_service.dart';
+import 'package:debt_manager_frontend/services/whatsapp_service.dart';
 import 'package:debt_manager_frontend/widgets/user_search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:debt_manager_frontend/providers/auth_provider.dart';
+import 'package:intl/intl.dart';
 
 class CustomersScreen extends StatefulWidget {
   @override
@@ -94,6 +96,153 @@ class _CustomersScreenState extends State<CustomersScreen> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _sendReportToCustomer(
+    BuildContext context,
+    User customer,
+  ) async {
+    try {
+      // Show date range selection dialog first
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      final currentDateRange = expenseProvider.dateRange ?? DateTimeRange(
+        start: DateTime.now().subtract(const Duration(days: 30)),
+        end: DateTime.now(),
+      );
+
+      final selectedDateRange = await showReportDateRangeDialog(
+        context: context,
+        initialRange: currentDateRange,
+      );
+
+      if (selectedDateRange == null) {
+        return; // User cancelled
+      }
+
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Preparing report for WhatsApp...'),
+            ],
+          ),
+        ),
+      );
+
+      final currentUserId = expenseProvider.getCurrentUserId();
+      final currentUser =
+          Provider.of<AuthProvider>(context, listen: false).user;
+
+      if (currentUser == null) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('User not found'),
+            backgroundColor: AppColors.errorColor,
+          ),
+        );
+        return;
+      }
+
+      // Fetch expenses between users
+      final allExpenses = await ApiService.fetchExpensesBetweenUsers(customer.id);
+
+      // Filter expenses by selected date range
+      final filteredExpenses = allExpenses.where((expense) {
+        final expenseDate = expense.createdAt;
+        return expenseDate.isAfter(selectedDateRange.start.subtract(Duration(days: 1))) &&
+               expenseDate.isBefore(selectedDateRange.end.add(Duration(days: 1)));
+      }).toList();
+
+      // Separate expenses
+      final created =
+          filteredExpenses.where((e) => e.creator.id == currentUserId).toList();
+      final owed = filteredExpenses.where((e) => e.debtor.id == currentUserId).toList();
+
+      // Calculate totals (only pending expenses)
+      final totalCreated = created
+          .where((e) => e.status == ExpenseStatus.PENDING)
+          .fold(0.0, (sum, e) => sum + e.amount);
+      final totalOwed = owed
+          .where((e) => e.status == ExpenseStatus.PENDING)
+          .fold(0.0, (sum, e) => sum + e.amount);
+      final net = totalCreated - totalOwed;
+
+      // Generate summary
+      String summary;
+      if (net > 0) {
+        summary = '${customer.fullName} owes you Rs. ${net.toStringAsFixed(2)}';
+      } else if (net < 0) {
+        summary =
+            'You owe ${customer.fullName} Rs. ${(-net).toStringAsFixed(2)}';
+      } else {
+        summary = 'All settled! No outstanding balance.';
+      }
+
+      // Generate PDF with date range
+      final pdfBytes = await buildExpenseReportPdf(
+        currentUser: currentUser,
+        customer: customer,
+        created: created,
+        owed: owed,
+        summary: summary,
+        dateRange: selectedDateRange,
+      );
+
+      // Format date range for message
+      final dateFormat = DateFormat('dd MMM yyyy');
+      final dateRangeText = '${dateFormat.format(selectedDateRange.start)} - ${dateFormat.format(selectedDateRange.end)}';
+
+      // Close loading dialog
+      Navigator.pop(context);
+
+      // Send via WhatsApp
+      final success = await WhatsAppService.sendReportToCustomer(
+        customer: customer,
+        pdfBytes: pdfBytes,
+        reportSummary: summary,
+        dateRangeText: dateRangeText,
+      );
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Report sent to ${customer.fullName} via WhatsApp!'),
+            backgroundColor: AppColors.successColor,
+            action: SnackBarAction(
+              label: 'OK',
+              textColor: Colors.white,
+              onPressed: () {},
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to send report. Please try again.'),
+            backgroundColor: AppColors.errorColor,
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send report: $e'),
+          backgroundColor: AppColors.errorColor,
+        ),
+      );
     }
   }
 
@@ -266,6 +415,21 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     trailing: PopupMenuButton(
                       itemBuilder:
                           (context) => [
+                            PopupMenuItem(
+                              child: ListTile(
+                                leading: Icon(
+                                  Icons.send,
+                                  color: Colors.green,
+                                ),
+                                title: Text('Send to Customer'),
+                                dense: true,
+                              ),
+                              onTap:
+                                  () => _sendReportToCustomer(
+                                    context,
+                                    customer,
+                                  ),
+                            ),
                             PopupMenuItem(
                               child: ListTile(
                                 leading: Icon(
