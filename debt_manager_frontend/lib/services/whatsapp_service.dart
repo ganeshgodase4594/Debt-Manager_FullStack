@@ -5,8 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:debt_manager_frontend/models/user.dart';
-// Conditional import for web
-import 'dart:html' as html;
+
+// Conditional imports for platform-specific functionality
+import 'web_helper.dart' if (dart.library.io) 'mobile_helper.dart' as platform_helper;
 
 class WhatsAppService {
   /// Send a report to customer via WhatsApp
@@ -131,12 +132,7 @@ Thank you!
   /// Download PDF file for web platform
   static void _downloadPdfForWeb(Uint8List pdfBytes, String customerName) {
     if (kIsWeb) {
-      final blob = html.Blob([pdfBytes], 'application/pdf');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url);
-      anchor.download = 'expense_report_${customerName.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf';
-      anchor.click();
-      html.Url.revokeObjectUrl(url);
+      platform_helper.downloadPdfForWeb(pdfBytes, customerName);
     }
   }
 
